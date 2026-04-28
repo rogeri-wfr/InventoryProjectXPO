@@ -19,16 +19,35 @@ namespace InventoryProjectXPO.Module.BusinessObjects.Master
             base.AfterConstruction();
         }
 
-        string _id;
-        string _name;
-        Boolean _active;
-
-        [Size(3)]
-        public string Id
+        protected override void OnSaving()
         {
-            get => _id;
-            set => SetPropertyValue(nameof(Id), ref _id, value);
+            base.OnSaving();
+            //Active = true;
+
+            // TODO: when it's new, need to add it into Inventory as well with stock 0, so that when it's added into inventory, it will be updated, not created
+            if (Session.IsNewObject(this))
+            {
+                //Active = true;
+                Inventory inventory = new Inventory(Session)
+                {
+                    CurrentStock = 0
+                };
+                inventory.GoodsFk.Add(this);
+            }
         }
+
+        //string _id;
+        string _name;
+        // TODO: not sure ini best practice untuk default value di sini atau di AfterConstruction/OnSaving
+        Boolean _active =true;
+
+        // NOTE: harusnya tak perlu ini karena oid by default dihandle XPO
+        //[Size(3)]
+        //public string Id
+        //{
+        //    get => _id;
+        //    set => SetPropertyValue(nameof(Id), ref _id, value);
+        //}
 
         public string Name
         {

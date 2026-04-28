@@ -23,7 +23,7 @@ namespace InventoryProjectXPO.Module.BusinessObjects.Master
         // TODO: coba baca ini utnuk apa, ini otomatis direkomendasikan
         // reference 1 : https://docs.devexpress.com/XPO/DevExpress.Xpo.AssociationAttribute
         // reference 2 : https://docs.devexpress.com/XPO/2041/create-a-data-model/relationships-between-objects
-        [Association("Goods-Inventories")]
+        //[Association("Goods-Inventories")]
         int _currentStock;
 
         //public Goods GoodFK
@@ -31,8 +31,10 @@ namespace InventoryProjectXPO.Module.BusinessObjects.Master
         //    get => _goods;
         //    set => SetPropertyValue(nameof(GoodFK), ref _goods, value);
         //}
-        
+
         // kalua relation one to many, sepertinya pakai xp collection ini
+        //[Association("Goods-Inventories")]
+
         public XPCollection<Goods> GoodsFk
         {
             //get { return GetCollection<Goods>(nameof(GoodsFk)); }
