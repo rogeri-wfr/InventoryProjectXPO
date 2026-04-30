@@ -46,7 +46,8 @@ namespace InventoryProjectXPO.Module.BusinessObjects.Master
                         //CurrentStock = Quantity
                         CurrentStock = 0
                     };
-                    inventory.GoodsFk.AddRange(GoodsFk);
+                    //inventory.GoodsFk.AddRange(GoodsFk);
+
                     inventory.Save();
 
                     // mungkin dibeginikan jadi update 2x, tapi sepertinya aneh
@@ -69,6 +70,7 @@ namespace InventoryProjectXPO.Module.BusinessObjects.Master
         //    get => _goods;
         //    set => SetPropertyValue(nameof(GoodFK), ref _goods, value);
         //}
+        // kalau ini 
         public XPCollection<Goods> GoodsFk
         {
             get => GetCollection<Goods>(nameof(GoodsFk));

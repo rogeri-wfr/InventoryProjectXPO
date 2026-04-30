@@ -127,6 +127,9 @@
     <Compile Include="BusinessObjects\Inventory.cs" />
     <Compile Include="BusinessObjects\IncomingGoods.cs" />
     <Compile Include="BusinessObjects\Master\Goods.cs" />
+    <Compile Include="Controllers\GoodsController.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DatabaseUpdate\Updater.cs" />
     <Compile Include="Module.cs">
       <SubType>Component</SubType>
