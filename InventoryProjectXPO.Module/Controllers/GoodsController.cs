@@ -36,36 +36,52 @@ namespace InventoryProjectXPO.Module.Controllers
             View.ObjectSpace.ObjectSaving += ObjectSpace_ObjectSaving;
         }
 
-        //protected override void OnDeactivated()
-        //{
-        //    base.OnDeactivated();
-        //    View.ObjectSpace.ObjectSaving -= ObjectSpace_ObjectSaving;
-        //}
+        protected override void OnDeactivated()
+        {
+            base.OnDeactivated();
+            View.ObjectSpace.ObjectSaving -= ObjectSpace_ObjectSaving;
+        }
 
         private void ObjectSpace_ObjectSaving(object sender, ObjectManipulatingEventArgs e)
         {
-            Debug.WriteLine("Object Saving... whilst also update invenotyr");
-            Debug.WriteLine(sender);
-            Debug.WriteLine(e);
+            var eClassName = e.Object.GetType().Name;
 
-            var inventoryExists = View.ObjectSpace.FindObject<Inventory>(new BinaryOperator("GoodFk", e.Object));
-            //Debug.WriteLine(inventoryExists);
-            Debug.WriteLine(e.Object);
-            if (inventoryExists == null)
+            // NOTE: sepertinya memang perlu conditional seperti ini,
+            // possibly karena newInventory.Save(), jadi balik ke sini lagi, berujung value e.Object-nya berubah 
+            if(eClassName == "Goods")
             {
-                Debug.WriteLine("Inventory no exists");
-                var obj = (Inventory)e.Object;
-                obj.CurrentStock = 0;
-                Debug.WriteLine("Obj");
-                Debug.WriteLine(obj);
-                //Inventory newInventory = View.ObjectSpace.CreateObject<Inventory>();
-                //newInventory.GoodFk = (Goods)e.Object;
-                //newInventory.CurrentStock = 0;
-                //newInventory.Save();
+                var eGoods = e.Object;
+                //Goods eGoods2 = (Goods)e.Object;
+
+                var inventoryExists = View.ObjectSpace.FindObject<Inventory>(new BinaryOperator("GoodFk", e.Object));
+                if (inventoryExists == null)
+                {
+
+                    Debug.WriteLine("Inventory no exists");
+
+                    // TODO: ini perlu cari alternative, kalua pakai cara yang sama seperti Haermes kena error karena bentuknya beda
+                    // kalau coba trace debug-nya memang benar, bentuknya beda 
+                    //var obj = (Inventory)e.Object;
+                    //obj.CurrentStock = 0;
+
+                    // TOOD: coba implement ini saja instead of pakai pengganti CType();
+                    Inventory newInventory = View.ObjectSpace.CreateObject<Inventory>();
+                    //var eInventory = e.Object;
+                    newInventory.GoodFk = (Goods)eGoods;
+                    newInventory.CurrentStock = 0;
+                    newInventory.Save();
+                }
+                else
+                {
+                    Debug.WriteLine("Inventory does exists : ");
+                }
             } else
             {
-                Debug.WriteLine("Inventory does exists : ");
+                // TODO: mungkin perlu tambahan error log kalau misalkan bukan goods atau inventory, tapi mestinya tak perlu
+                // karena bisa jadi else-nya banyak
             }
+
+            
 
         }
 
