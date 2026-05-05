@@ -8,6 +8,7 @@ using System.Diagnostics;
 using DevExpress.ExpressApp.SystemModule;
 using InventoryProjectXPO.Module.BusinessObjects.Master;
 using DevExpress.Data.Filtering;
+using DevExpress.Xpo;
 
 namespace InventoryProjectXPO.Module.Controllers
 {
@@ -48,13 +49,20 @@ namespace InventoryProjectXPO.Module.Controllers
 
             // NOTE: sepertinya memang perlu conditional seperti ini,
             // possibly karena newInventory.Save(), jadi balik ke sini lagi, berujung value e.Object-nya berubah 
+            // Kalua banyak bisa jadikan switch case saja biar rapi
             if(eClassName == "Goods")
             {
                 var eGoods = e.Object;
+                var isNew = View.ObjectSpace.IsNewObject(eGoods);
                 //Goods eGoods2 = (Goods)e.Object;
+                //if(TargetObjectType.GUID == Guid.Empty) { }
+                // TODO: mungkin bisa coba pakai ini saja instead of pakai inventoryExists seperti di bawah
+                // Harusnya bisa lebih efisien gitu 
+                //if (View.ObjectSpace.IsNewObject(e.Object)) { }
 
-                var inventoryExists = View.ObjectSpace.FindObject<Inventory>(new BinaryOperator("GoodFk", e.Object));
-                if (inventoryExists == null)
+                //var inventoryExists = View.ObjectSpace.FindObject<Inventory>(new BinaryOperator("GoodFk", e.Object));
+                //if (inventoryExists == null)
+                if (isNew)
                 {
 
                     Debug.WriteLine("Inventory no exists");
