@@ -1,9 +1,4 @@
 ﻿using DevExpress.ExpressApp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using DevExpress.ExpressApp.SystemModule;
 using InventoryProjectXPO.Module.BusinessObjects.Master;
@@ -12,12 +7,11 @@ using DevExpress.Xpo;
 
 namespace InventoryProjectXPO.Module.Controllers
 {
-    public class GoodsController : ViewController
+    public class GoodsController : ViewController<DetailView>
     {
         public GoodsController()
         {
             TargetObjectType = typeof(Goods);
-            //TargetViewType = ViewType.ListView;
             TargetViewType = ViewType.DetailView;
         }
 
@@ -25,7 +19,6 @@ namespace InventoryProjectXPO.Module.Controllers
         {
             base.OnActivated();
             //View.ObjectSpace.ObjectSaved += ObjectSpace_ObjectSaved;
-            Debug.WriteLine("On Activated!");
             //ModificationsController modCont = Frame.GetController<ModificationsController>();
             //if (modCont != null)
             //{
@@ -34,14 +27,42 @@ namespace InventoryProjectXPO.Module.Controllers
             //}
 
             //View.ObjectSpace.ObjectChanged += ObjectSpace_ObjectChanged;
+            Debug.WriteLine("Goods Controller activated");
             View.ObjectSpace.ObjectSaving += ObjectSpace_ObjectSaving;
+            // TODO: ini tidak jalan, perlu trace.
+            // viewType detail view juga sama saja, coba pakai modificationsController
+            View.ObjectSpace.ObjectDeleting += ObjectSpace_ObjectDeleting;
         }
 
         protected override void OnDeactivated()
         {
             base.OnDeactivated();
             View.ObjectSpace.ObjectSaving -= ObjectSpace_ObjectSaving;
+            View.ObjectSpace.ObjectDeleting -= ObjectSpace_ObjectDeleting;
         }
+
+        private void ObjectSpace_ObjectDeleting(object sender, ObjectsManipulatingEventArgs e)
+        {
+            Debug.WriteLine("Deleting from GoodsController");
+            var eClassName = e.Objects.GetType().Name;
+            if (eClassName == "Goods")
+            {
+                // NOTE: tidak bisa pakai FromLambda karena di v17 pun belum ada
+                //var todel = View.ObjectSpace.GetObjects<Inventory>(CriteriaOperator.FromLambda());
+                // TODO: mungkin bisa disimplify biar pakai batch deletion
+                foreach (var obj in e.Objects)
+                {
+                    Goods eGoods = (Goods)obj;
+                    Inventory foundInventory = View.ObjectSpace.FindObject<Inventory>(new BinaryOperator("GoodFk", eGoods));
+                    foundInventory?.Delete();
+                    foundInventory?.Session.CommitTransaction();
+                }
+                // TODO: perlu test kalau pakai ini bisa apply deletion-nya atau perlu lakukan di tiap iteration
+                View.ObjectSpace.CommitChanges();
+            }
+        }
+
+        
 
         private void ObjectSpace_ObjectSaving(object sender, ObjectManipulatingEventArgs e)
         {
@@ -60,7 +81,7 @@ namespace InventoryProjectXPO.Module.Controllers
                 // Harusnya bisa lebih efisien gitu 
                 //if (View.ObjectSpace.IsNewObject(e.Object)) { }
 
-                //var inventoryExists = View.ObjectSpace.FindObject<Inventory>(new BinaryOperator("GoodFk", e.Object));
+                var inventoryExists = View.ObjectSpace.FindObject<Inventory>(new BinaryOperator("GoodFk", e.Object));
                 //if (inventoryExists == null)
                 if (isNew)
                 {
@@ -93,11 +114,14 @@ namespace InventoryProjectXPO.Module.Controllers
 
         }
 
-        private void ObjectSpace_ObjectChanged(object sender, ObjectChangedEventArgs e)
-        {
-            Debug.WriteLine("Object Changed!");
-            //throw new NotImplementedException();
-        }
+       
+
+        //private void ObjectSpace_ObjectChanged(object sender, ObjectChangedEventArgs e)
+        //{
+        //    Debug.WriteLine("Object Changed!");
+        //    //throw new NotImplementedException();
+        //}
+
 
         private void SaveAction_Execute(object sender, DevExpress.ExpressApp.Actions.SimpleActionExecuteEventArgs e)
         {
