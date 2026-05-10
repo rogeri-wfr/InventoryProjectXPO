@@ -3,6 +3,7 @@ using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Xpo;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace InventoryProjectXPO.Module.BusinessObjects.Master
@@ -155,5 +156,13 @@ namespace InventoryProjectXPO.Module.BusinessObjects.Master
             get => _active;
             set => SetPropertyValue(nameof(Active), ref _active, value);
         }
+
+        #region Associations
+        [Association("Goods-IncomingGoods"), Browsable(false)]
+        public XPCollection<IncomingGoods> Incoming
+        {
+            get => GetCollection<IncomingGoods>(nameof(Incoming));
+        }
+        #endregion
     }
 }

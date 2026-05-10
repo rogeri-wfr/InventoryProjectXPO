@@ -1,10 +1,11 @@
 ﻿using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Xpo;
+using InventoryProjectXPO.Module.BusinessObjects.Master;
 using System;
 
 // TODO: need t adjust so user can only edit inventory
-namespace InventoryProjectXPO.Module.BusinessObjects.Master
+namespace InventoryProjectXPO.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [CreatableItem(false)]
@@ -47,6 +48,7 @@ namespace InventoryProjectXPO.Module.BusinessObjects.Master
 
         // TODO: sepertinya ini perlu foreign key yang jelas untuk association
         //[Association("Goods-Inventories")]
+        // TODO: ini mestinya bisa pakai aggregated, tapi bisa skip dulu karena ini mesitnya juga tak boleh edit
         //[Aggregated]
         public Goods GoodFk
         {

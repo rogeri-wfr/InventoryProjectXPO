@@ -136,6 +136,9 @@
     <Compile Include="Controllers\GoodsListViewController.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controllers\IncomingGoodsController.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DatabaseUpdate\Updater.cs" />
     <Compile Include="Module.cs">
       <SubType>Component</SubType>

@@ -4,6 +4,7 @@ using DevExpress.ExpressApp.SystemModule;
 using InventoryProjectXPO.Module.BusinessObjects.Master;
 using DevExpress.Data.Filtering;
 using DevExpress.Xpo;
+using InventoryProjectXPO.Module.BusinessObjects;
 
 namespace InventoryProjectXPO.Module.Controllers
 {
@@ -82,7 +83,6 @@ namespace InventoryProjectXPO.Module.Controllers
                 //if (inventoryExists == null)
                 if (isNew)
                 {
-
                     Debug.WriteLine("Inventory no exists");
 
                     // TODO: ini perlu cari alternative, kalua pakai cara yang sama seperti Haermes kena error karena bentuknya beda

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using InventoryProjectXPO.Module.BusinessObjects.Master;
 using DevExpress.Data.Filtering;
+using InventoryProjectXPO.Module.BusinessObjects;
 
 namespace InventoryProjectXPO.Module.Controllers
 {
