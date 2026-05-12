@@ -4,6 +4,7 @@ using DevExpress.Persistent.BaseImpl;
 using DevExpress.Xpo;
 using InventoryProjectXPO.Module.BusinessObjects.Master;
 using System;
+using System.Diagnostics;
 
 namespace InventoryProjectXPO.Module.BusinessObjects
 {
@@ -60,8 +61,51 @@ namespace InventoryProjectXPO.Module.BusinessObjects
             //        //inventory.Save();
             //    }
             //}
-
+            if (!Session.IsNewObject(this))
+            {
+                // TODO: ini untuk case kalau Goods tidak ada diubah,
+                // kalau diubah berarti perlu adjust 2 inventory yang berbeda
+                Inventory inventory = Session.FindObject<Inventory>(new BinaryOperator("GoodFk", GoodsFk));
+                if (inventory != null)
+                {
+                    var prevQuantity = (int)Session.GetObjectByKey<IncomingGoods>(this.Oid).Quantity;
+                    var prevQuantity2 = this.ClassInfo.FindMember(nameof(Quantity)).GetOldValue(this);
+                    var newQuantity = this.Quantity;
+                    Debug.WriteLine($"prevQuantity: {prevQuantity}, prevQuantity2: {prevQuantity2}, newQuantity: {newQuantity}, prevQuantity3: {_prevQuantity}");
+                    inventory.CurrentStock += newQuantity - prevQuantity;
+                    //inventory.Session.CommitTransaction();
+                    inventory.Save();
+                }
+            }
         }
+
+        int _prevQuantity;
+        Goods _prevGoods;
+        // OnChanged ini sepertinya tetap jalan setiap perubahan field layak-nya ObjectChanged di ViewController
+        protected override void OnChanged(string propertyName, object oldValue, object newValue)
+        {
+            base.OnChanged(propertyName, oldValue, newValue);
+            if (!IsLoading)
+            {
+                switch (propertyName)
+                {
+                    case nameof(Quantity):
+                        _prevQuantity = (int)oldValue;
+                        break;
+                    case nameof(GoodsFk):
+                        _prevGoods = (Goods)oldValue;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            Debug.WriteLine($"_prevQuantity : {_prevQuantity}, _prevGoods: {_prevGoods}");
+            //if(propertyName == nameof(Quantity) && !IsLoading)
+            //{
+            //    _prevQuantity = (int)oldValue;
+            //}
+        }
+
 
         Goods _goods;
         // TODO: coba baca ini utnuk apa, ini otomatis direkomendasikan

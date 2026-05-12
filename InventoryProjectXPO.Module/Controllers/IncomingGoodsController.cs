@@ -2,8 +2,12 @@
 
 using DevExpress.Data.Filtering;
 using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.Xpo;
+using DevExpress.Xpo;
+using DevExpress.Xpo.Metadata;
 using InventoryProjectXPO.Module.BusinessObjects;
 using InventoryProjectXPO.Module.BusinessObjects.Master;
+using System.Diagnostics;
 
 namespace InventoryProjectXPO.Module.Controllers
 {
@@ -19,14 +23,14 @@ namespace InventoryProjectXPO.Module.Controllers
         {
             base.OnActivated();
             View.ObjectSpace.ObjectSaving += ObjectSpace_ObjectSaving;
-            View.ObjectSpace.ObjectChanged += ObjectSpace_ObjectChanged;
+            //View.ObjectSpace.ObjectChanged += ObjectSpace_ObjectChanged;
         }
 
         protected override void OnDeactivated()
         {
             base.OnDeactivated();
             View.ObjectSpace.ObjectSaving -= ObjectSpace_ObjectSaving;
-            View.ObjectSpace.ObjectChanged -= ObjectSpace_ObjectChanged;
+            //View.ObjectSpace.ObjectChanged -= ObjectSpace_ObjectChanged;
         }
 
         private void ObjectSpace_ObjectSaving(object sender, ObjectManipulatingEventArgs e)
@@ -63,6 +67,13 @@ namespace InventoryProjectXPO.Module.Controllers
                         var prevValue = eIncomingGoods.Session.GetObjectByKey<IncomingGoods>(eIncomingGoods.Oid);
                         var prevValue2 = View.ObjectSpace.FindObject<IncomingGoods>(new BinaryOperator("Oid", eIncomingGoods.Oid));
                         //var prevValue3 = View.ObjectSpace.FindObject<IncomingGoods>(eIncomingGoods);
+                        // V4: tidak bisa pakai cara ini, GetOldValue tidak ada di Session. Mungkin fitur baru
+                        //var sess = ((XPObjectSpace)ObjectSpace).Session;
+                        //var memb = sess.GetClassInfo(eIncomingGoods).FindMember(nameof(IncomingGoods.Quantity));
+                        //var prevValue4 = sess.GetOldValue(eIncomingGoods, memb);
+                        XPMemberInfo miQuant = eIncomingGoods.ClassInfo.GetMember("Quantity");
+                        IXPModificationsStore ms = PersistentBase.GetModificationsStore(eIncomingGoods);
+                        var prevValue5 = ms.GetPropertyOldValue(miQuant);
                         if (prevValue != null)
                         {
                             //int newCurrentStock = relatedInventory.CurrentStock + (eIncomingGoods.Quantity - prevValue.Quantity);
@@ -86,9 +97,10 @@ namespace InventoryProjectXPO.Module.Controllers
 
         }
 
-        private void ObjectSpace_ObjectChanged(object sender, ObjectChangedEventArgs e)
-        {
-            throw new System.NotImplementedException();
-        }
+        // Kalau pakai ini, setiap field changes kena trigger, baiknya jangan takut affecting performance
+        //private void ObjectSpace_ObjectChanged(object sender, ObjectChangedEventArgs e)
+        //{
+        //    Debug.WriteLine("Check if this triggers everytime");
+        //}
     }
 }
